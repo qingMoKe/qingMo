@@ -1,0 +1,281 @@
+
+Git分布式版本控制工具:
+    1.分布式版本控制和集中式版本控制:
+        (1)分布式版本控制是不需要中央服务器，每个开发人员的电脑都是一个版本库(本地仓库)。这样不需要联网也可以进行版本控制。
+           当然也有一个远程仓库(GitHub)，用来管理一个团体项目。
+        (2)集中式版本控制是需要中央服务器，而且需要网络。每次需要到中央服务器下载版本，修改后再将版本上传到中央服务器。
+        (3)集中式版本控制工具(SVN)的文件管理机制:
+            以文件变更列表的方式存储信息，也就是说只保存修改过的文件。这样的有点是可以节省服务器中的存储空间。
+        (4)分布式版本控制工具(Git)的文件管理机制:
+            Git的文件管理机制是把数据看作小型文件的一组快照。每次提交更新时，Git都会对当前版本的全部文件生成一组快照，
+            并保存这组快照的索引。如果文件没有修改，Git不会重新存储该文件，而是生成一个链接指向之前版本存储的文件。
+
+    2.Git的版本控制模块:
+        远程仓库(Remote)      个人仓库/本地仓库(Repository)      工作区(Workspace)    暂存区(Index Stage)
+
+    3.Git使用:
+        (1)安装 Git软件:
+            下载 Git 软件，并安装
+        (2)初始化 git设置:
+            1.设置签名:
+                设置项目级别/仓库级别:
+                    git config user.name 用户名
+                    git config user.email 用户的email
+                    数据保存在 .git/config/  目录中
+                设置系统用户级别:
+                    git config --global user.name 用户名
+                    git config --global user.email 用户的email
+                    数据保存在 C:\Users\userName\.gitConfig\  目录中
+                注意:
+                    必须设置签名，否则 使用 push推送项目版本时会报错
+                    就近原则: 如果项目级别存在就使用项目级别，不存在时才使用系统用户级别设置
+            2.获取 git配置信息:
+                git config --list
+            3.获取某个 git配置信息:
+                git config 配置名称
+                例如: git config user.name    查看配置的用户名
+        (3)创建本地仓库(本地版本库):
+            git init
+            注意:
+                创建的本地仓库(本地版本库)为当前目录
+        (4)创建远程仓库(GitHub Remote):
+            需要注册GitHub或者GitEe网站账号，并创建远程仓库
+        (5)添加提交命令:
+            1.查看当前状态:
+                git status
+            2.添加到暂存区:
+                git add  文件        添加指定的文件
+                git add .            添加当前目录下的文件(新文件和修改的文件，不包括删除的文件)
+                git add -u           添加当前目录下的文件(修改的文件和删除的文件，不包括新的文件)
+                    /git add --update
+                git add --all        添加当前目录下的所有文件
+                    /git add -A
+                从暂存区删除:
+                    rm  文件              删除工作区中的文件
+                    git rm 文件           删除工作区和暂存区中的文件
+                    git rm -cached 文件   删除暂存区和本地版本库中的文件
+                取消文件的暂存:
+                    git reset HEAD 文件
+            3.提交到本地仓库(本地版本库):
+                git commit 文件            提交指定文件，会自动调用文本编辑器，编辑描述信息
+                git commit -m "描述信息" 文件   提交文件，附加描述信息
+                撤销修改:
+                    git checkout -- 文件    切换本地仓库中的文件，达到撤销文件修改的作用
+                提交修改的文件:
+                    git commit -a -m "描述信息" 文件     不需要添加到暂存区，直接提交的本地版本库
+                提交文件追加内容:
+                    git commit --amend 文件   将修改后的文件覆盖上次提交的文件，不会生成新的版本号
+        (6)Git历史版本:
+            1.查看Git历史版本记录:
+                git log         显示版本记录的信息(版本散列值、用户信息、时间、描述信息)
+                显示历史版本记录的格式:
+                    git log --pretty=online   简写版本历史记录，只显示版本信息的版本散列值和描述信息
+                    git log --online          简写版本历史记录，只显示版本信息的简写版本散列值和描述信息
+            2.Git历史版本前进回退的本质:
+                git reflog          简写版本历史记录，只显示版本信息的简写版本散列值和描述信息以及
+                                    HEAD指向历史版本的游标(用于切换版本历史记录的前进或后退的步数)
+                HEAD 指针:
+                    HEAD指针是一种特殊指针可以指向版本也可以指向分支(Branch)。而分支(Branch)也是指针，
+                    分支指针指向的是版本。当HEAD指针指向某一分支时，表示正在操作当前分支，而当前分支指向
+                    某一版本时，表示正在使用当前版本。
+            3.Git历史版本的前进和回退:
+                (1)基于索引值(版本散列值):
+                    1.使用 git reflog  获取历史版本记录的 索引值和 HEAD
+                    2.git reset --hard 版本散列值    根据索引值切换到指定的版本
+                (2)使用^符号:
+                    1.使用 git reflog  获取历史版本记录的 索引值和 HEAD@{index}
+                    2.HEAD@{0} 表示当前使用的版本，HEAD@{index} index表示回退或前进的步数
+                    3.git reset --hard HEAD^
+                        回退版本，一个^表示回退一个版本，n个^表示回退的n个版本
+                (3)使用~符号:
+                    1.使用 git reflog  获取历史版本记录的 索引值和 HEAD@{index}
+                    2.HEAD@{0} 表示当前使用的版本，HEAD@{index} index表示回退或前进的步数
+                    3.git reset --hard HEAD~1
+                        回退版本，~1表示回退一个版本，~n表示回退的n个版本
+                (4)注意:
+                    基于索引值的版本切换即可以进行版本的前进也可以回退
+                    使用^和~的版本切换只能用于版本的回退
+                    所以推荐使用基于索引值的版本切换
+            4.hard、soft和mixed的区别:
+                (1)git reset --hard  :
+                    在本地库中移动 HEAD指针，重置暂存区，重置工作区
+                (2)git reset --soft  :
+                    只在本地库中移动 HEAD指针
+                (3)git reset --mixed :
+                    在本地库中移动 HEAD指针，重置暂存区
+                (4)注意:
+                    如果没有重置暂存区或者工作区，那么暂存区或者工作区中的数据还是之前没有进行版本切换时的数据。
+        (7)删除文件后找回:
+            1.删除文件:
+                rm  文件              删除工作区中的文件
+                git rm 文件           删除工作区和暂存区中的文件
+                git rm -cached 文件   删除暂存区和本地版本库中的文件
+            2.永久删除文件后找回:
+                 (1)找回 rm 删除的文件:
+                    git status          查看状态
+                    git add 文件        更新暂存区
+                    git commit -m "描述信息" 文件     提交到本地仓库(版本库)
+                 (2)找回 git rm 删除的文件:
+                    git checkout -- 文件              切换版本库中的文件，替换为工作区中的文件
+                 (3)找回 git rm -cached 删除的文件:
+                    git reset -hard 索引值     回退到历史版本，来获取被删除的文件
+        (8)比较文件:
+            git diff 文件         比较工作区中的文件
+            git diff HEAD 文件    比较本地库中的文件
+            git diff HEAD^ 文件   比较历史版本文件
+            注意:
+                比较的是文件中每行的数据。"-"表示删除的行，"+"表示增加的行
+        (9)操作远程仓库:
+            将本地仓库和远程仓库建立连接:
+                git remote add origin 远程仓库服务器URL
+            申请ssh密钥:
+                ssh-keygen -t rsa
+                ssh-keygen -t rsa -C GitHub的Email账号
+                生成的密钥对保存在当前电脑用户目录下的 .ssh目录下
+            将本地仓库推送到远程仓库:
+                git push origin master          将本地仓库提交到 origin服务器的 master分支
+                git push -u origin master       将本地仓库更新到 origin服务器的 master分支
+            将远程仓库下载到本地仓库:
+                git clone 远程仓库的路径
+            更新本地仓库:
+                git pull
+            远程仓库的其他命令:
+                git remote      查看所有远程仓库服务器的别名
+                git remote -v   查看所有远程仓库服务器的别名和url
+
+    4.分支Branch:
+        (1)Git的默认分支:
+            git默认的分支为master。
+        (2)分支操作:
+            查看所有分支:
+                git branch -v
+            创建分支:
+                git branch 分支名
+            切换分支:
+                git checkout 分支名
+            分支合并:
+                git checkout 分支名          切换到 要合并的分支
+                git merge 指定分支           将指定分支合并到当前分支
+                注意:
+                    分支合并就是将指定分支中的 新的内容，更新到当前分支。
+                    当前执行的分支是 要合并的分支，指定分支是 被合并的分支。
+            分支删除:
+                git branch -d 分支
+            查看合并的分支:
+                git branch --merged     查看合并到当前分支的分支
+        (3)分支冲突:
+            如果两个分支都有新的内容，git不知道如何合并，所以就发生了合并冲突。
+            解决方法:
+                1.人为修改文件中的内容，并删除提示内容。
+                2.查看文件状态:  git status
+                3.提交暂存区文件，更新文件状态:  git add 文件名
+                4.合并分支: git commit -m "描述信息"
+                    将修改后的文件，提交到版本库中，合并到当前分支中。
+
+    5.Git项目托管中心:
+        (1)外网环境:
+            GitHub、码云
+        (2)局域网环境:
+            GitLab、Docker
+            注意:
+                在外网环境下的项目托管，是属于开源的，就是说其他用户可以访问和下载该项目。所以一般使用局域网环境下
+                开发项目，使用局域网环境的私服仓库托管项目。
+        (3)远程仓库:
+            1.将本地仓库和远程仓库关联:
+                git remote add origin 远程仓库服务器URL
+                注意:
+                    origin 可以修改为其他别名，如果修改为其他名称，其他操作就需要使用修改后的别名。
+            2.查看所有关联的远程仓库:
+                git remote          查看所有远程仓库的别名
+                git remote -v       查看所有远程仓库的别名和URL
+            3.将本地仓库推送到远程仓库:
+                git push origin master          将本地仓库提交到 origin服务器的 master分支
+                git push -u origin master       将本地仓库更新到 origin服务器的 master分支
+                注意:
+                    如果不是基于远程仓库中最新版所做的修改，可能不能推送，必须先更新本地仓库。
+            4.将远程仓库下载到本地仓库:
+                git clone 远程仓库的路径        用于下载他人的远程仓库到本地
+                (1)完整的把远程仓库下载到本地
+                (2)初始化本地仓库，不需要自己初始化本地仓库
+                (3)远程仓库带有别名和分支，不需要自己创建
+            5.更新本地仓库:
+                git pull origin master
+            6.更新本地仓库:
+                (1)git fetch origin master     抓取远程仓库中更新的分支
+                (2)使用 git fetch origin master 只是将远程仓库下载到本地，所以本地仓库中工作区中并没有下载的远程仓库
+                (3)git checkout origin/master       切换到下载的远程仓库中
+                (4)将下载的远程仓库合并本地仓库:
+                    git merge  origin/master
+            7.git pull 和 git fetch + git merge 的区别:
+                git pull 相当于 git fetch + git merge，实现更新本地仓库
+                使用 git pull 更新本地仓库时，可能会发生合并冲突。而使用 git fetch + git merge 时可以对远程仓库进行
+                查看，避免合并冲突，和更新仓库不可逆的行为。
+
+    6.Git工作流:
+        (1)集中式工作流:
+            集中式工作流以中央仓库作为项目所有修改的单点实体。所有的修改都提交到这个master分支上。Git的集中式工作流
+            和SVN相比，主要区别就是开发人员有本地版本库。但是没有用到Git的很多特性。
+        (2)GitFlow工作流:
+            GitFlow工作流通过功能开发、发布准备和维护设立了独立的分支，让发布迭代过程更加流畅。
+        (3)Forking工作流:
+            Forking工作流是在GitFlow基础上，充分利用了Git的 Fork和 pull request的功能达到代码审核的目的。
+            更加适合安全可靠的管理大型团队开发，而且可以接受其他开发人员的提交。
+
+    7.GitLab私服:
+        (1)安装CentOS7系统:
+            在虚拟机中安装Linux系统
+        (2)安装GitLab服务器:
+            1.配置相关依赖:
+                第一步:安装SSH:
+                  sudo yum install -y curl policycoreutils-pythonopenssh-server
+                第二步:将SSH服务设置成开机自启动，安装命令:
+                    sudo systemctl enable sshd
+                第三步:启动SSH服务，安装命令:
+                    sudo systemctl start sshd
+                第四步：安装防火墙（如果已经安装了防火墙并且已经在运行状态，则可直接进行第6步）
+                    yum install firewalld systemd -y
+                第五步:启防火墙，安装命令:
+                    service firewalld  start
+                第六步:添加http服务到firewalld,pemmanent表示永久生效，若不加--permanent系统下次启动后就会失效。
+                    sudo firewall-cmd --permanent --add-service=http
+                第七步:重启防火墙，安装命令:
+                    sudo systemctl reload firewalld
+                第八步:接下来，安装Postfix以发送通知邮件，安装命令:
+                    sudo yum install postfix
+                第九步:将postfix服务设置成开机自启动，安装命令:
+                    sudo systemctl enable postfix
+                第10步:启动postfix，安装命令:
+                    sudo systemctl start postfix
+                第11步:wget 用于从外网上下载插件
+                    检查系统中是否已经安装wget，使用命令若出现下图wget相关版本描述则说明系统中已经安装wget 若报系统找不到
+                    命令说明wget未安装,若wget未安装则进行安装，安装命令:
+                        yum -y install wget
+                第12步:安装vim编辑器,安装命令:
+                    yum install vim -y
+            2.安装GitLab服务器:
+                1.下载gitlab镜像:
+                    wget https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el7/gitlab-ce-10.0.0-ce.0.el7.x86_64.rpm
+                2.安装gitlab,安装命令:
+                    rpm -i gitlab-ce-10.0.0-ce.0.el7.x86_64.rpm
+                    注意: gitlab-ce-10.0.0-ce.0.el7.x86_64.rpm表示的是下载后保存的文件
+                    如果发生错误异常:
+                        gitlab-ce-10.*.* 提示 error: Failed dependencies:
+                        warning: gitlab-ce-10.0.0-ce.0.el7.x86_64.rpm: Header V4 RSA/SHA1 Signature, key ID f27eab47:
+                                 NOKEY
+                        error: Failed dependencies:
+                            policycoreutils-python is needed by gitlab-ce-10.0.0-ce.0.el7.x86_64
+                    安装gitlab的依赖项:
+                        yum install policycoreutils-python
+                        重新执行之前安装步骤
+                3.修改gitlab配置文件指定服务器ip和自定义端口:
+                    vim  /etc/gitlab/gitlab.rb
+                    进入 vim编辑器后按 "i" 键进入编辑状态，ESC键退出编辑状态
+                      自定义服务器的ip和端口号: external_url 'http://192.168.0.208:9000'
+                      注意: 端口号不能冲突
+                    退出并保存，命令输入 ":wq"
+                4.重置并启动GitLab
+                    gitlab-ctl reconfigure
+                    gitlab-ctl restart
+                    提示  "ok: run:"表示启动成功
+                5.访问 GitLab页面:
+                    输入自定义的服务器ip和端口号，注册用户和密码(需要记住)
